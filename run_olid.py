@@ -232,8 +232,7 @@ def main():
         return result
 
     datasets = datasets.map(preprocess_function, batched=True, load_from_cache_file=not data_args.overwrite_cache)
-    # print(datasets)
-    # return
+
     train_dataset = datasets["train"]
     test_dataset = datasets["test"]
 
@@ -241,10 +240,13 @@ def main():
     for index in random.sample(range(len(train_dataset)), 3):
         logger.info(f"Sample {index} of the training set: {train_dataset[index]}.")
 
+    metric = load_metric("f1")
+
     def compute_metrics(p: EvalPrediction):
         preds = p.predictions[0] if isinstance(p.predictions, tuple) else p.predictions
         preds = np.argmax(preds, axis=1)
-        return {"accuracy": (preds == p.label_ids).astype(np.float32).mean().item()}
+        result = metric.compute(predictions=preds, references=p.label_ids)
+        return result
 
     # Initialize our Trainer
     trainer = Trainer(
