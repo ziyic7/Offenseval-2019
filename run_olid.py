@@ -183,6 +183,7 @@ def main():
     label_list = datasets["train"].unique("label")
     label_list.sort()  # Let's sort it for determinism
     num_labels = len(label_list)
+    print("DEBUG:", num_labels)
     # Load pretrained model and tokenizer
     #
     # In distributed training, the .from_pretrained methods guarantee that only one local process can concurrently
@@ -245,7 +246,7 @@ def main():
     def compute_metrics(p: EvalPrediction):
         preds = p.predictions[0] if isinstance(p.predictions, tuple) else p.predictions
         preds = np.argmax(preds, axis=1)
-        result = metric.compute(predictions=preds, references=p.label_ids)
+        result = metric.compute(predictions=preds, references=p.label_ids, average="macro")
         return result
 
     # Initialize our Trainer

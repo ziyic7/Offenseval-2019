@@ -58,7 +58,7 @@ class Offenseval(datasets.GeneratorBasedBuilder):
                 {
                     "idx": datasets.Value("int32"),
                     "tweet": datasets.Value("string"),
-                    "label": datasets.features.ClassLabel(names=["NOT", "OFF"]),
+                    "label": datasets.features.ClassLabel(names=["OFF", "NOT"]),
                     # "subtask_b": datasets.features.ClassLabel(names=["NULL", "TIN", "UNT"]),
                     # "subtask_c": datasets.features.ClassLabel(names=["NULL", "IND", "GRP"])
                 }
@@ -109,4 +109,6 @@ class Offenseval(datasets.GeneratorBasedBuilder):
             with open(filepath, encoding="utf-8") as f:
                 reader = csv.DictReader(f, delimiter="\t", quoting=csv.QUOTE_NONE)
                 for idx, row in enumerate(reader):
+                    if row["subtask_a"] == "NULL":
+                        continue
                     yield idx, {"idx": row["id"], "tweet": row["tweet"], "label": row["subtask_a"]}
